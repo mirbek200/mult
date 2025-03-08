@@ -82,6 +82,3 @@ class SubCategoryDetailView(APIView):
         subcategory = get_object_or_404(SubCategory, pk=pk)
         subcategory.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# class SubCategoryOnMainPageView(APIView):
