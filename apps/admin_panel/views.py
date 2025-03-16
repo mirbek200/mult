@@ -84,4 +84,4 @@ class SubCategoryDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class SubCategoryOnMainPageView(APIView):
+# class SubCategoryOnMainPageView(APIView):
