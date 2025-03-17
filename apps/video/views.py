@@ -25,12 +25,9 @@ class VideoGenerationView(APIView):
         # main_folder = "data_for_video/main"
         # audio_path = "data_for_video/audio.wav"
 
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-        intro_folder = os.path.join(BASE_DIR, "data_for_video/intro")
-        main_folder = os.path.join(BASE_DIR, "data_for_video/main")
-        audio_path = os.path.join(BASE_DIR, "data_for_video/audio.wav")
-
+        intro_folder = "/home/ubuntu/mult/data_for_video/intro"
+        main_folder = "/home/ubuntu/mult/data_for_video/main"
+        audio_path = "/home/ubuntu/mult/data_for_video/audio.wav"
 
         def load_images_from_folder(folder):
             images = []
