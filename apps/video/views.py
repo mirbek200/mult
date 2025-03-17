@@ -10,76 +10,61 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class VideoGenerationView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
+        logger.info("Запрос получен")
+
         if 'background' not in request.FILES:
+            logger.error("Файл background не передан")
             return Response({"error": "Background image is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        background = Image.open(request.FILES['background']).convert("RGBA")
-        width, height = background.size
-        fps = int(request.data.get("fps", 30))
+        try:
+            background = Image.open(request.FILES['background']).convert("RGBA")
+            width, height = background.size
+            fps = int(request.data.get("fps", 30))
+            logger.info(f"Background image загружен: {width}x{height}, FPS: {fps}")
+        except Exception as e:
+            logger.error(f"Ошибка при загрузке background: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # intro_folder = "data_for_video/intro"
-        # main_folder = "data_for_video/main"
-        # audio_path = "data_for_video/audio.wav"
-
+        # Проверяем существование директорий
         intro_folder = "/home/ubuntu/mult/data_for_video/intro"
         main_folder = "/home/ubuntu/mult/data_for_video/main"
         audio_path = "/home/ubuntu/mult/data_for_video/audio.wav"
 
-        def load_images_from_folder(folder):
-            images = []
+        for folder in [intro_folder, main_folder]:
             if not os.path.exists(folder):
-                return images
-            files = sorted(os.listdir(folder))
-            for filename in files:
-                if filename.endswith(".png"):
-                    img = Image.open(os.path.join(folder, filename)).convert("RGBA")
-                    img = ImageOps.expand(img, border=2, fill=(0, 0, 0, 0))
-                    images.append(img)
-            return images
+                logger.error(f"Папка {folder} не найдена")
 
-        def blend_images(base, overlay):
-            base = base.convert("RGBA")
-            overlay = overlay.convert("RGBA")
-            temp = Image.new("RGBA", base.size, (0, 0, 0, 0))
-            temp.paste(overlay, (0, 0), overlay)
-            return Image.alpha_composite(base, temp)
+        if not os.path.exists(audio_path):
+            logger.warning(f"Аудиофайл {audio_path} отсутствует")
 
-        intro_frames = load_images_from_folder(intro_folder)
-        main_frames = load_images_from_folder(main_folder)
+        # Загружаем изображения
+        intro_frames = self.load_images_from_folder(intro_folder)
+        main_frames = self.load_images_from_folder(main_folder)
 
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        output_path = "output_video.mp4"
-        video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        if not intro_frames and not main_frames:
+            logger.error("Нет кадров для обработки!")
+            return Response({"error": "No frames to process"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        def write_frames(frames):
-            for frame in frames:
-                combined = blend_images(background, frame)
-                frame_bgr = cv2.cvtColor(np.array(combined.convert("RGB")), cv2.COLOR_RGB2BGR)
-                video.write(frame_bgr)
+        # Создаём видео
+        try:
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            output_path = "output_video.mp4"
+            video = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            self.write_frames(video, background, intro_frames)
+            self.write_frames(video, background, main_frames)
+            video.release()
+            logger.info(f"Видео сохранено в {output_path}")
+        except Exception as e:
+            logger.error(f"Ошибка при создании видео: {e}")
+            return Response({"error": "Failed to generate video"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        write_frames(intro_frames)
-        write_frames(main_frames)
-        video.release()
+        return FileResponse(open(output_path, "rb"), as_attachment=True, filename="generated_video.mp4")
 
-        if os.path.exists(audio_path):
-            video_clip = VideoFileClip(output_path)
-            audio_clip = AudioFileClip(audio_path)
-            video_clip = video_clip.with_audio(audio_clip)
-            output_with_audio = "final_output.mp4"
-            video_clip.write_videofile(output_with_audio, codec="libx264", fps=fps)
-            os.remove(output_path)  # Удаляем файл без звука
-            output_path = output_with_audio
-
-        if not os.path.exists(output_path):
-            return JsonResponse({"error": "Failed to generate video"}, status=500)
-
-        return FileResponse(
-            open(output_path, "rb"),
-            as_attachment=True,
-            filename="generated_video.mp4",
-            content_type="video/mp4"
-        )
