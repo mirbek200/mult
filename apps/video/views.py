@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps
 from django.http import FileResponse, JsonResponse
-from moviepy.editor import VideoFileClip, AudioFileClip
+from moviepy import VideoFileClip, AudioFileClip
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
