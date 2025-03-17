@@ -126,13 +126,14 @@
 #             img = Image.alpha_composite(background, img).convert("RGB")
 #             frame = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 #             video.write(frame)
-import io
+
+
 import os
 import cv2
 import numpy as np
 import subprocess
 from PIL import Image
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -233,25 +234,12 @@ class VideoGenerationView(APIView):
         logger.info(f"Загружено {len(images)} изображений из {folder}")
         return images
 
-    def write_frames(request):
-        try:
-            # Загружаем изображения
-            background = Image.open("background.png").convert("RGBA")
-            img = Image.open("img.png").convert("RGBA")
+    def write_frames(self, video, background, frames):
+        if not frames:
+            logger.warning("Попытка добавить пустой список кадров.")
+            return
 
-            # Отладочная информация
-            print(f"Background mode: {background.mode}, size: {background.size}")
-            print(f"Img mode: {img.mode}, size: {img.size}")
-
-            # Композиция изображений
+        for img in frames:
             img = Image.alpha_composite(background, img).convert("RGB")
-
-            # Сохранение в память
-            output = io.BytesIO()
-            img.save(output, format="JPEG")
-            output.seek(0)
-
-            return HttpResponse(output.read(), content_type="image/jpeg")
-        except Exception as e:
-            return HttpResponse(f"Ошибка: {str(e)}", status=500)
-
+            frame = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+            video.write(frame)
