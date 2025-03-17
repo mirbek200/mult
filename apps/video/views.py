@@ -78,7 +78,7 @@ class VideoGenerationView(APIView):
 
                 # Обрезаем или повторяем аудио, чтобы соответствовать длине видео
                 audio_clip = audio_clip.subclip(0, min(audio_clip.duration, video_clip.duration))
-                final_video = video_clip.set_audio(audio_clip)
+                final_video = video_clip.with_audio(audio_clip)
                 final_video.write_videofile(final_video_path, codec="libx264", fps=fps)
 
                 logger.info(f"Финальное видео сохранено: {final_video_path}")
