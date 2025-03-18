@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ["51.20.122.147"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://51.20.122.147",
+    "https://png-bice.vercel.app/"
 ]
 
 
@@ -72,6 +73,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sub.example.com",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://png-bice.vercel.app",
 ]
 CORS_ALLOW_METHODS = (
     "DELETE",
