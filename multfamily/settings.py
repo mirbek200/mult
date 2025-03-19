@@ -25,11 +25,12 @@ SECRET_KEY = 'django-insecure-o7&q^*&95_a=l=()%b=q@1=yp$e%u-&ilv9_m+%(e^hacrsm%y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["51.20.122.147"]
+ALLOWED_HOSTS = ["51.20.122.147", "3.110.232.60"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://51.20.122.147",
-    "https://png-bice.vercel.app/"
+    "https://png-bice.vercel.app/",
+    "https://3.110.232.60/"
 ]
 
 
