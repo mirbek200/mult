@@ -28,11 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1", "158.160.177.178"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://51.20.122.147",
+    "https://158.160.177.178",
     "https://png-bice.vercel.app/",
-    "https://3.110.232.60/",
-    "https://15.206.213.121/",
-    "http://158.160.179.63/"
 ]
 
 
