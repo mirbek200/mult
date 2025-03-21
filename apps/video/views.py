@@ -31,6 +31,7 @@ class VideoGenerationView(APIView):
             logger.error(f"Ошибка при обработке background: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
         base_path = "/home/platon/mult/data_for_video"
         intro_folder = os.path.join(base_path, "intro")
         main_folder = os.path.join(base_path, "main")
@@ -97,14 +98,7 @@ class VideoGenerationView(APIView):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
                 try:
                     img_path = os.path.join(folder, filename)
-                    img = Image.open(img_path)
-
-                    # Проверяем, загружено ли изображение корректно
-                    if img is None:
-                        logger.error(f"Ошибка загрузки изображения {filename}: NoneType")
-                        continue
-
-                    img = img.convert("RGBA")
+                    img = Image.open(img_path).convert("RGBA")
                     images.append(img)
                 except Exception as e:
                     logger.error(f"Ошибка загрузки изображения {filename}: {e}")
@@ -118,24 +112,6 @@ class VideoGenerationView(APIView):
             return
 
         for img in frames:
-            try:
-                img = Image.alpha_composite(background, img).convert("RGB")
-
-                # Проверка перед преобразованием
-                if img is None:
-                    logger.error("Ошибка: изображение после alpha_composite равно None.")
-                    continue
-
-                # Преобразуем в numpy-массив
-                np_img = np.array(img)
-
-                # Логируем параметры изображения
-                logger.info(f"Обрабатываем кадр: {np_img.shape}, dtype: {np_img.dtype}")
-
-                # Преобразуем цветовую схему
-                frame = cv2.cvtColor(np_img, cv2.COLOR_RGB2BGR)
-
-                # Записываем кадр в видео
-                video.write(frame)
-            except Exception as e:
-                logger.error(f"Ошибка обработки кадра: {e}")
+            img = Image.alpha_composite(background, img).convert("RGB")
+            frame = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+            video.write(frame)
