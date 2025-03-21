@@ -161,9 +161,13 @@ class VideoGenerationView(APIView):
             logger.error(f"Ошибка при обработке background: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        intro_folder = "/home/ubuntu/mult/data_for_video/intro"
-        main_folder = "/home/ubuntu/mult/data_for_video/main"
-        audio_path = "/home/ubuntu/mult/data_for_video/audio.wav"
+        # intro_folder = "/home/ubuntu/mult/data_for_video/intro"
+        # main_folder = "/home/ubuntu/mult/data_for_video/main"
+        # audio_path = "/home/ubuntu/mult/data_for_video/audio.wav"
+        base_path = "/home/ubuntu/mult/data_for_video"
+        intro_folder = os.path.join(base_path, "intro")
+        main_folder = os.path.join(base_path, "main")
+        audio_path = os.path.join(base_path, "audio.wav")
         temp_video_path = "temp_video.mp4"
         final_video_path = "output_video.mp4"
 
