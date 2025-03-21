@@ -12,6 +12,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+FFMPEG_PATH = "/usr/bin/ffmpeg"
+
 class VideoGenerationView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -30,7 +32,6 @@ class VideoGenerationView(APIView):
         except Exception as e:
             logger.error(f"Ошибка при обработке background: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
         base_path = "/home/platon/mult/data_for_video"
         intro_folder = os.path.join(base_path, "intro")
@@ -70,7 +71,7 @@ class VideoGenerationView(APIView):
             if os.path.exists(audio_path):
                 logger.info("Добавление аудио в видео...")
                 command = [
-                    "ffmpeg", "-y", "-i", temp_video_path, "-i", audio_path,
+                    FFMPEG_PATH, "-y", "-i", temp_video_path, "-i", audio_path,
                     "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", final_video_path
                 ]
                 subprocess.run(command, check=True)
@@ -95,7 +96,7 @@ class VideoGenerationView(APIView):
 
         images = []
         for filename in sorted(os.listdir(folder)):
-            if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            if filename.lower().endswith((".png", ".jpg", ".jpeg")):
                 try:
                     img_path = os.path.join(folder, filename)
                     img = Image.open(img_path).convert("RGBA")
