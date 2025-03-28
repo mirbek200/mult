@@ -20,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o7&q^*&95_a=l=()%b=q@1=yp$e%u-&ilv9_m+%(e^hacrsm%y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -72,7 +71,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://png-bice.vercel.app",
-    "https://png-umber.vercel.app/"
 ]
 CORS_ALLOW_METHODS = (
     "DELETE",
